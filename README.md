@@ -1,6 +1,6 @@
 # PythonPixelClassifier
 
-Pixel Classifier (i.e. Image Segmenter) in Python
+Pixel classifier (i.e. image segmenter) in Python
 
 For a demo, run RunMe.py
 
