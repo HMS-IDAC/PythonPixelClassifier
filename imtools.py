@@ -77,17 +77,19 @@ def imlogfilt(I,sigma,**kwargs):
 def imderivatives(I,sigmas):
     if type(sigmas) is not list:
         sigmas = [sigmas]
-    nDerivatives = len(sigmas)*6 # d0,dx,dy,dxx,dxy,dyy
+    nDerivatives = len(sigmas)*8 # d0,dx,dy,dxx,dxy,dyy,sqrt(dx^2+dy^2),sqrt(dxx^2+dyy^2)
     sI = size(I)
     D = np.zeros((sI[0],sI[1],nDerivatives))
     for i in range(len(sigmas)):
         sigma = sigmas[i]
-        D[:,:,6*i]   = imgaussfilt(I,sigma)
-        D[:,:,6*i+1] = imgaussfilt(I,sigma,order=[0,1])
-        D[:,:,6*i+2] = imgaussfilt(I,sigma,order=[1,0])
-        D[:,:,6*i+3] = imgaussfilt(I,sigma,order=[0,2])
-        D[:,:,6*i+4] = imgaussfilt(I,sigma,order=[1,1])
-        D[:,:,6*i+5] = imgaussfilt(I,sigma,order=[2,0])
+        D[:,:,8*i  ] = imgaussfilt(I,sigma)
+        D[:,:,8*i+1] = imgaussfilt(I,sigma,order=[0,1])
+        D[:,:,8*i+2] = imgaussfilt(I,sigma,order=[1,0])
+        D[:,:,8*i+3] = imgaussfilt(I,sigma,order=[0,2])
+        D[:,:,8*i+4] = imgaussfilt(I,sigma,order=[1,1])
+        D[:,:,8*i+5] = imgaussfilt(I,sigma,order=[2,0])
+        D[:,:,8*i+6] = np.sqrt(D[:,:,8*i+1]**2+D[:,:,8*i+2]**2)
+        D[:,:,8*i+7] = np.sqrt(D[:,:,8*i+3]**2+D[:,:,8*i+5]**2)
     return D
 
 def circcentlikl(I,radius,scale=2,n0piAngles=8):
@@ -154,13 +156,13 @@ def imfeatures(I=[],sigmaDeriv=1,sigmaLoG=1,cfRadii=[],cfSigma=2,cfThr=0.75,cfDs
         sigmaLoG = [sigmaLoG]
     if type(cfRadii) is not list:
         cfRadii = [cfRadii]
-    nDerivFeats = len(sigmaDeriv)*6
+    nDerivFeats = len(sigmaDeriv)*8
     nLoGFeats = len(sigmaLoG)
     nCircFeats = len(cfRadii)*2
     nFeatures = nDerivFeats+nLoGFeats+nCircFeats
     if justfeatnames == True:
         featNames = []
-        derivNames = ['d0','dx','dy','dxx','dxy','dyy']
+        derivNames = ['d0','dx','dy','dxx','dxy','dyy','normD1','normD2']
         for i in range(len(sigmaDeriv)):
             for j in range(len(derivNames)):
                 featNames.append('derivSigma%d%s' % (sigmaDeriv[i],derivNames[j]))
